@@ -1,6 +1,7 @@
 image: julia:0.6
 
 before_script:
+  - apt-get update && apt-get -y install bzip2 make gcc
   - mkdir ~/.julia && mkdir ~/.julia/v0.6 && ln -s $PWD ~/.julia/v0.6/PhasedArray
 
 testjob:
