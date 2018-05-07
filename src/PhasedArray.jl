@@ -1,6 +1,6 @@
 module PhasedArray
 
-  using Interpolations, CoordinateTransformations, PyPlot, MAT
+  using Interpolations, CoordinateTransformations, PyPlot
   import Base.transpose
 
   export manifold, plot_pattern, plot_pattern_3D, plot_manifold_3D

@@ -14,7 +14,7 @@ function plot_pattern(get_steer_vec, reduce_ant_fun = norm, num_az = 360, num_el
     els = linspace(0, π / 2, num_el)
     values = [reduce_ant_fun(get_steer_vec(Spherical(1.0, az, π / 2 - el))) for el in els, az in azs]
     figure()
-    ax = gen_polar_axes()
+    ax = draw_polar_axes()
     pcolormesh(azs, els * 180 / π, values, cmap = get_cmap("jet"))
     ax[:grid](true)
     colorbar()
@@ -75,7 +75,7 @@ function plot_manifold_3D(get_steer_vec, ant_pos, reduce_to_real = abs, num_az =
     end
 end
 
-function gen_polar_axes()
+function draw_polar_axes()
     ax = axes(polar="true")
     dtheta=45
     ax[:set_thetagrids](collect(0:dtheta:360-dtheta))
