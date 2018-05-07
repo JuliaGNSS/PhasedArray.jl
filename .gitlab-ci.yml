@@ -1,0 +1,8 @@
+image: julia:0.6
+
+before_script:
+  - mkdir ~/.julia && mkdir ~/.julia/v0.6 && ln -s $PWD ~/.julia/v0.6/PhasedArray
+
+testjob:
+  script:
+    - julia -e 'Pkg.test("PhasedArray")'
