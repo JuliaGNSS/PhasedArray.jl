@@ -11,13 +11,13 @@ Currently it provides the creation of antenna array manifolds of ideal antennas 
 ## Getting started
 
 Install:
-```
+```julia
 Pkg.clone("git@git.rwth-aachen.de:nav/PhasedArray.jl.git")
 ```
 
 ## Usage
 
-```
+```julia
 using PhasedArray
 using StaticArrays
 ant_pos = 0.1904 / 4 * [1 -1 1 -1; 1 1 -1 -1; 0 0 0 0]
@@ -28,7 +28,7 @@ plot_pattern_3D(get_steer_vec)
 
 or based on a LUT:
 
-```
+```julia
 using PhasedArray
 using StaticArrays
 using MAT
