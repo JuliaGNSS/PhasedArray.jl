@@ -1,3 +1,4 @@
+[![pipeline status](https://git.rwth-aachen.de/nav/PhasedArray.jl/badges/master/pipeline.svg)](https://git.rwth-aachen.de/nav/PhasedArray.jl/commits/master)
 ![Example Pattern](assets/example_pattern.png)
 # PhasedArray.jl
 This module provides common functions associated with antenna arrays.
