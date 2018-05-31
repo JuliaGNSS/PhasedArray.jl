@@ -13,7 +13,7 @@ julia> cur_steer_vec = steer_vec(SVector(0,0,1))
 """
 function manifold(ant_pos::Array{Float64, 2}, f_0, ampl = doa -> 1, c₀ = 299_792_458)
   λ = c₀ / f_0
-  return doa -> cis.(2 * π / λ * doa' * ant_pos).' .* ampl(doa);
+  doa -> cis.(2 * π / λ * doa' * ant_pos).' .* ampl(doa);
 end
 
 """
@@ -23,7 +23,7 @@ end
 Calculates the manifold based on a Look up Table (LuT).
 Returns a function to get the steering vector based on DOA.
 Interpolation is done by B-splines.
-The parameter `interpolation` can be set to Constant(), Linear(), Quadratic(), Cubic()
+The parameter `interpolation` can be set to Constant(), Linear(), Quadratic(Reflect()), Cubic(Reflect())
 For more information see https://github.com/JuliaMath/Interpolations.jl
 
 # Examples
@@ -46,14 +46,20 @@ function manifold(lut::Array{Complex{Float64}, 3}, interpolation = Constant(), m
   lut_expanded[:,:,1] = lut[:,:,num_θs]
   lut_expanded[:,:,num_θs + 2] = lut[:,:,1]
   itp = interpolate(lut_expanded, (NoInterp(), BSpline(interpolation), BSpline(interpolation)), OnGrid())
-  return doa -> begin
-    ϕ = π / 2 - doa.ϕ # convert to mathematic
-    θ = doa.θ + π * ((ϕ < 0) || (ϕ > π))
-    ϕ = ϕ - (2 * ϕ) * (ϕ < 0) - (2 * (ϕ - π)) * (ϕ > π && max_el == π) - (ϕ - max_el) * (ϕ > max_el) # 0 <= ϕ <= max_el
-    idx_ϕ = ϕ / res_ϕ + 1
-    idx_θ = mod(θ / res_θ, num_θs) + 2
-    return [itp[ant,idx_ϕ,idx_θ] for ant = 1:num_ants]
-  end
+  doa -> _get_steer_vec(doa, itp, res_ϕ, res_θ, num_θs, num_ants, max_el)
+end
+
+function _get_steer_vec(doa::Spherical, itp_lut, res_ϕ, res_θ, num_θs, num_ants, max_el)
+  ϕ = π / 2 - doa.ϕ # convert to mathematic
+  θ = doa.θ + π * ((ϕ < 0) || (ϕ > π))
+  ϕ = ϕ - (2 * ϕ) * (ϕ < 0) - (2 * (ϕ - π)) * (ϕ > π && max_el == π) - (ϕ - max_el) * (ϕ > max_el) # 0 <= ϕ <= max_el
+  idx_ϕ = ϕ / res_ϕ + 1
+  idx_θ = mod(θ / res_θ, num_θs) + 2
+  [itp_lut[ant,idx_ϕ,idx_θ]::Complex{Float64} for ant = 1:num_ants]
+end
+
+function _get_steer_vec(doa, itp_lut, res_ϕ, res_θ, num_θs, num_ants, max_el)
+  _get_steer_vec(Spherical(doa), itp_lut, res_ϕ, res_θ, num_θs, num_ants, max_el)
 end
 
 """
@@ -66,7 +72,7 @@ function norm_manifold(lut::Array{Complex{Float64}, 3})
   num_ants = size(lut, 1)
   steer_vecs_powers = sum(abs2.(lut), 1);
   max_gain = maximum(vec(steer_vecs_powers)) / num_ants;
-  return lut ./ sqrt(max_gain);
+  lut ./ sqrt(max_gain);
 end
 
 function test_lut_correctness(lut::Array{Complex{Float64}, 3}, max_el)

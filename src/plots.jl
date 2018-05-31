@@ -9,15 +9,14 @@ julia> steer_vec = manifold(0.1904 / 4 * [1 -1 1 -1; 1 1 -1 -1; 0 0 0 0], 157542
 julia> plot_pattern(steer_vec)
 ```
 """
-function plot_pattern(get_steer_vec, reduce_ant_fun = norm, num_az = 360, num_el = 91)
+function plot_pattern(fig, position, get_steer_vec, reduce_ant_fun = norm, num_az = 360, num_el = 91)
     azs = linspace(0, 2 * π, num_az)
     els = linspace(0, π / 2, num_el)
     values = [reduce_ant_fun(get_steer_vec(Spherical(1.0, az, π / 2 - el))) for el in els, az in azs]
-    figure()
-    ax = draw_polar_axes()
-    pcolormesh(azs, els * 180 / π, values, cmap = get_cmap("jet"))
+    ax = draw_polar_axes(fig, position)
+    pattern_plot = ax[:pcolormesh](azs, els * 180 / π, values, cmap = get_cmap("jet"))
     ax[:grid](true)
-    colorbar()
+    fig[:colorbar](pattern_plot, pad = 0.14)
 end
 
 """
@@ -32,8 +31,8 @@ julia> plot_pattern_3D(steer_vec)
 ```
 """
 
-function plot_pattern_3D(get_steer_vec, reduce_ant_fun = norm, num_az = 360, num_el = 181, max_el = num_el - 1)
-    figure()
+function plot_pattern_3D(fig, position, get_steer_vec, reduce_ant_fun = norm, num_az = 360, num_el = 181, max_el = num_el - 1)
+    ax = fig[:add_subplot](position...)
     azs = linspace(0, 2 * π, num_az)
     els = linspace(0, max_el * π / 180, num_el)
     doas_sph = [Spherical(1.0, az, π / 2 - el) for el in els, az in azs]
@@ -43,7 +42,7 @@ function plot_pattern_3D(get_steer_vec, reduce_ant_fun = norm, num_az = 360, num
     X = [doa[1] for doa in scaled_doas_cart]
     Y = [doa[2] for doa in scaled_doas_cart]
     Z = [doa[3] for doa in scaled_doas_cart]
-    plot_surface(X, Y, Z, alpha = 0.4, facecolors = get_cmap("jet")(gains / maximum(gains)), shade = false, linewidth = 0, antialiased = false)
+    ax[:plot_surface](X, Y, Z, alpha = 0.4, facecolors = get_cmap("jet")(gains / maximum(gains)), shade = false, linewidth = 0, antialiased = false)
 end
 
 """
@@ -58,8 +57,8 @@ julia> plot_manifold_3D(steer_vec,[1 -1 1 -1; 1 1 -1 -1; 0 0 0 0])
 ```
 """
 
-function plot_manifold_3D(get_steer_vec, ant_pos, reduce_to_real = abs, num_az = 360, num_el = 181, max_el = num_el - 1)
-    figure()
+function plot_manifold_3D(fig, position, get_steer_vec, ant_pos, reduce_to_real = abs, num_az = 360, num_el = 181, max_el = num_el - 1)
+    ax = fig[:add_subplot](position...)
     num_ants = size(ant_pos, 2)
     azs = linspace(0, 2 * π, num_az)
     els = linspace(0, max_el * π / 180, num_el)
@@ -71,12 +70,12 @@ function plot_manifold_3D(get_steer_vec, ant_pos, reduce_to_real = abs, num_az =
     Y = [doa[2] for doa in scaled_doas_cart]
     Z = [doa[3] for doa in scaled_doas_cart]
     for ant = 1:num_ants
-        plot_surface(X[ant,:,:] + ant_pos[1,ant], Y[ant,:,:] + ant_pos[2,ant], Z[ant,:,:] + ant_pos[3,ant], alpha = 0.4, facecolors = get_cmap("jet")(gains[ant,:,:] / maximum(gains[ant,:,:])), shade = false, linewidth = 0, antialiased = false)
+        ax[:plot_surface](X[ant,:,:] + ant_pos[1,ant], Y[ant,:,:] + ant_pos[2,ant], Z[ant,:,:] + ant_pos[3,ant], alpha = 0.4, facecolors = get_cmap("jet")(gains[ant,:,:] / maximum(gains[ant,:,:])), shade = false, linewidth = 0, antialiased = false)
     end
 end
 
-function draw_polar_axes()
-    ax = axes(polar="true")
+function draw_polar_axes(fig, position)
+    ax = fig[:add_subplot](position..., polar="true")
     dtheta=45
     ax[:set_thetagrids](collect(0:dtheta:360-dtheta))
     ax[:set_theta_zero_location]("N")
