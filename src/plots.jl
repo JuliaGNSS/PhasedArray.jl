@@ -10,13 +10,18 @@ julia> plot_pattern(steer_vec)
 ```
 """
 function plot_pattern(fig, position, get_steer_vec, reduce_ant_fun = norm, num_az = 360, num_el = 91)
-    azs = linspace(0, 2 * π, num_az)
-    els = linspace(0, π / 2, num_el)
-    values = [reduce_ant_fun(get_steer_vec(Spherical(1.0, az, π / 2 - el))) for el in els, az in azs]
+    azs, els, values = pattern_plotting_data(get_steer_vec, reduce_ant_fun = reduce_ant_fun, num_az = num_az, num_el = num_el)
     ax = draw_polar_axes(fig, position)
     pattern_plot = ax[:pcolormesh](azs, els * 180 / π, values, cmap = get_cmap("jet"))
     ax[:grid](true)
     fig[:colorbar](pattern_plot, pad = 0.14)
+end
+
+function pattern_plotting_data(get_steer_vec, reduce_ant_fun = norm, num_az = 360, num_el = 91)
+    azs = linspace(0, 2 * π, num_az)
+    els = linspace(0, π / 2, num_el)
+    values = [reduce_ant_fun(get_steer_vec(Spherical(1.0, az, π / 2 - el))) for el in els, az in azs]
+    azs, els, values
 end
 
 """
@@ -32,7 +37,12 @@ julia> plot_pattern_3D(steer_vec)
 """
 
 function plot_pattern_3D(fig, position, get_steer_vec, reduce_ant_fun = norm, num_az = 360, num_el = 181, max_el = num_el - 1)
+    X, Y, Z, gains = pattern_3D_plotting_data(get_steer_vec, reduce_ant_fun = norm, num_az = 360, num_el = 181, max_el = num_el - 1)
     ax = fig[:add_subplot](position...)
+    ax[:plot_surface](X, Y, Z, alpha = 0.4, facecolors = get_cmap("jet")(gains / maximum(gains)), shade = false, linewidth = 0, antialiased = false)
+end
+
+function pattern_3D_plotting_data(get_steer_vec, reduce_ant_fun = norm, num_az = 360, num_el = 181, max_el = num_el - 1)
     azs = linspace(0, 2 * π, num_az)
     els = linspace(0, max_el * π / 180, num_el)
     doas_sph = [Spherical(1.0, az, π / 2 - el) for el in els, az in azs]
@@ -42,7 +52,7 @@ function plot_pattern_3D(fig, position, get_steer_vec, reduce_ant_fun = norm, nu
     X = [doa[1] for doa in scaled_doas_cart]
     Y = [doa[2] for doa in scaled_doas_cart]
     Z = [doa[3] for doa in scaled_doas_cart]
-    ax[:plot_surface](X, Y, Z, alpha = 0.4, facecolors = get_cmap("jet")(gains / maximum(gains)), shade = false, linewidth = 0, antialiased = false)
+    X, Y, Z, gains
 end
 
 """
