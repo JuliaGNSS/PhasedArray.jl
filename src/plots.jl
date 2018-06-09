@@ -10,7 +10,7 @@ julia> plot_pattern(steer_vec)
 ```
 """
 function plot_pattern(fig, position, get_steer_vec, reduce_ant_fun = norm, num_az = 360, num_el = 91)
-    azs, els, values = pattern_plotting_data(get_steer_vec, reduce_ant_fun = reduce_ant_fun, num_az = num_az, num_el = num_el)
+    azs, els, values = pattern_plotting_data(get_steer_vec, reduce_ant_fun, num_az, num_el)
     ax = draw_polar_axes(fig, position)
     pattern_plot = ax[:pcolormesh](azs, els * 180 / π, values, cmap = get_cmap("jet"))
     ax[:grid](true)
@@ -37,7 +37,7 @@ julia> plot_pattern_3D(steer_vec)
 """
 
 function plot_pattern_3D(fig, position, get_steer_vec, reduce_ant_fun = norm, num_az = 360, num_el = 181, max_el = num_el - 1)
-    X, Y, Z, gains = pattern_3D_plotting_data(get_steer_vec, reduce_ant_fun = norm, num_az = 360, num_el = 181, max_el = num_el - 1)
+    X, Y, Z, gains = pattern_3D_plotting_data(get_steer_vec, reduce_ant_fun, num_az, num_el, max_el)
     ax = fig[:add_subplot](position...)
     ax[:plot_surface](X, Y, Z, alpha = 0.4, facecolors = get_cmap("jet")(gains / maximum(gains)), shade = false, linewidth = 0, antialiased = false)
 end

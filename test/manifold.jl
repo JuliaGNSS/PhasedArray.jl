@@ -1,5 +1,3 @@
-using PhasedArray, StaticArrays, CoordinateTransformations
-
 @testset "Antenna" begin
 
   @testset "Ideal manifold" begin

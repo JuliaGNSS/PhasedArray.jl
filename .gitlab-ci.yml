@@ -1,7 +1,6 @@
 image: julia:0.6
 
 before_script:
-  - apt-get update && apt-get -y install python-dev python-matplotlib
   - julia -e 'Pkg.clone(pwd())'
 
 testjob:
