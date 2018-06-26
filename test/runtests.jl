@@ -7,3 +7,4 @@ EXAMPLE_LUT[2,:,:] = [-6.05477+9.15928im -2.92805+10.582im 0.485278+10.9689im 3.
 
 include("manifold.jl")
 include("plots.jl")
+include("filter.jl")
