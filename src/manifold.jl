@@ -71,7 +71,7 @@ Normalizes the manifold such that the maximal norm is 2.
 function norm_manifold(lut::Array{Complex{Float64}, 3})
   num_ants = size(lut, 1)
   steer_vecs_powers = sum(abs2.(lut), 1);
-  max_gain = maximum(vec(steer_vecs_powers)) / num_ants;
+  max_gain = maximum(steer_vecs_powers) / num_ants;
   lut ./ sqrt(max_gain);
 end
 
