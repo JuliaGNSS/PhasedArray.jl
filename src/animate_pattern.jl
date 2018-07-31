@@ -20,7 +20,6 @@ function animate_pattern(fig, position, animate_pattern_data)
     fig[:colorbar](pattern_plot, label = "Amplification (dB)")
     snr_text = ax[:text](315 * π / 180, 130, @sprintf("CN0: %.1f dB-Hz", sat_cn0))
 
-    # Define the init function, which draws the first frame (empty, in this case)
     function init()
         (pattern_plot, jammer_plot, snr_text)
     end
