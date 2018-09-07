@@ -18,8 +18,8 @@ function plot_pattern(fig, position, get_steer_vec, reduce_ant_fun = norm, num_a
 end
 
 function pattern_plotting_data(get_steer_vec, reduce_ant_fun = norm, num_az = 360, num_el = 91)
-    azs = linspace(0, 2 * π, num_az)
-    els = linspace(0, π / 2, num_el)
+    azs = range(0, stop = 2 * π, length = num_az)
+    els = range(0, stop = π / 2, length = num_el)
     values = [reduce_ant_fun(get_steer_vec(Spherical(1.0, az, π / 2 - el))) for el in els, az in azs]
     azs, els, values
 end
@@ -35,7 +35,6 @@ julia> steer_vec = manifold(0.1904 / 4 * [1 -1 1 -1; 1 1 -1 -1; 0 0 0 0], 157542
 julia> plot_pattern_3D(steer_vec)
 ```
 """
-
 function plot_pattern_3D(fig, position, get_steer_vec, reduce_ant_fun = norm, num_az = 360, num_el = 181, max_el = num_el - 1)
     X, Y, Z, gains = pattern_3D_plotting_data(get_steer_vec, reduce_ant_fun, num_az, num_el, max_el)
     ax = fig[:add_subplot](position...)
@@ -43,8 +42,8 @@ function plot_pattern_3D(fig, position, get_steer_vec, reduce_ant_fun = norm, nu
 end
 
 function pattern_3D_plotting_data(get_steer_vec, reduce_ant_fun = norm, num_az = 360, num_el = 181, max_el = num_el - 1)
-    azs = linspace(0, 2 * π, num_az)
-    els = linspace(0, max_el * π / 180, num_el)
+    azs = range(0, stop = 2 * π, length = num_az)
+    els = range(0, stop = max_el * π / 180, length = num_el)
     doas_sph = [Spherical(1.0, az, π / 2 - el) for el in els, az in azs]
     doas_cart = [CartesianFromSpherical()(doa_sph) for doa_sph in doas_sph]
     gains = [reduce_ant_fun(get_steer_vec(doa_sph)) for doa_sph in doas_sph]
@@ -66,12 +65,11 @@ julia> steer_vec = manifold(0.1904 / 4 * [1 -1 1 -1; 1 1 -1 -1; 0 0 0 0], 157542
 julia> plot_manifold_3D(steer_vec,[1 -1 1 -1; 1 1 -1 -1; 0 0 0 0])
 ```
 """
-
 function plot_manifold_3D(fig, position, get_steer_vec, ant_pos, reduce_to_real = abs, num_az = 360, num_el = 181, max_el = num_el - 1)
     ax = fig[:add_subplot](position...)
     num_ants = size(ant_pos, 2)
-    azs = linspace(0, 2 * π, num_az)
-    els = linspace(0, max_el * π / 180, num_el)
+    azs = range(0, stop = 2 * π, length = num_az)
+    els = range(0, stop = max_el * π / 180, length = num_el)
     doas_sph = [Spherical(1.0, az, π / 2 - el) for el in els, az in azs]
     doas_cart = [CartesianFromSpherical()(doa_sph) for ant = 1:num_ants, doa_sph in doas_sph]
     gains = [reduce_to_real(get_steer_vec(doa_sph)[ant]) for ant = 1:num_ants, doa_sph in doas_sph]
