@@ -2,7 +2,7 @@
     test_signal = complex.(randn(1000,2), randn(1000,2)) / sqrt(2)
     pre_whitening_filter = PhasedArray.calc_prewhitening_filter(test_signal)
     @test pre_whitening_filter ≈ I atol = 0.1
-    @test filter(I, test_signal) == test_signal
+    @test filter(Matrix{Complex{Float64}}(I, 2, 2), test_signal) == test_signal
 end
 
 @testset "Amplitude filter" begin
