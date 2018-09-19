@@ -9,5 +9,10 @@ function calc_amplitude_filter(signal)
 end
 
 function filter(filter_matrix::AbstractArray, signal::Array{Complex{Float64},2})
-    signal * filter_matrix
+    signal * filter_matrix'
+end
+
+function calc_eigen_beamformer(signal)
+    Rxx = Hermitian(signal' * signal) / size(signal, 1)
+    eigvecs(Rxx)[:,end]
 end

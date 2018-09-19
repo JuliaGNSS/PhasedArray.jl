@@ -15,7 +15,8 @@ module PhasedArray
         animate_pattern,
         filter,
         calc_prewhitening_filter,
-        calc_amplitude_filter
+        calc_amplitude_filter,
+        calc_eigen_beamformer
 
     include("manifold.jl")
     include("plots.jl")
