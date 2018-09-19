@@ -2,6 +2,11 @@
     test_signal = complex.(randn(1000, 2), randn(1000, 2)) / sqrt(2)
     pre_whitening_filter = calc_prewhitening_filter(test_signal)
     @test pre_whitening_filter ≈ I atol = 0.1
+
+    test_signal = complex.(randn(1000, 2), randn(1000, 2)) / sqrt(2) * sqrt(100) # Power: 100
+    pre_whitening_filter = calc_prewhitening_filter(test_signal)
+    @test pre_whitening_filter ≈ I atol = 0.1
+
     @test filter(Matrix{Complex{Float64}}(I, 2, 2), test_signal) == test_signal
 end
 
@@ -9,6 +14,10 @@ end
     test_signal = complex.(randn(1000, 2), randn(1000, 2)) / sqrt(2)
     amplitude_filter = calc_amplitude_filter(test_signal)
     @test amplitude_filter ≈ I atol = 0.1
+
+    test_signal = complex.(randn(1000, 2), randn(1000, 2)) / sqrt(2) * sqrt(100) # Power: 100
+    pre_whitening_filter = calc_amplitude_filter(test_signal)
+    @test pre_whitening_filter ≈ I atol = 0.1
 end
 
 @testset "Eigen beamformer" begin

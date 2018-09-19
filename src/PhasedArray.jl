@@ -1,6 +1,6 @@
 module PhasedArray
 
-    using Interpolations, CoordinateTransformations, Statistics, LinearAlgebra, Printf, PyCall, PyPlot
+    using Interpolations, CoordinateTransformations, Statistics, LinearAlgebra, Printf, PyCall, PyPlot, LinearAlgebra
     import Base.transpose, Base.filter
 
     export
