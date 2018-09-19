@@ -7,7 +7,7 @@ end
 function calc_amplitude_filter(signal)
     Rxx = calc_variance_covariance(signal)
     eigen_values, eigen_vectors = eig(Rxx)
-    eigen_vectors * diagm(1 ./ sqrt.(eigen_values)) * eigen_vectors' .* sqrt(mean_power(eigen_values))
+    eigen_vectors * diagm(1 ./ eigen_values) * eigen_vectors' .* mean_power(eigen_values)
 end
 
 function filter(filter_matrix::AbstractArray, signal::Array{Complex{Float64},2})
