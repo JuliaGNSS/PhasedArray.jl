@@ -1,11 +1,9 @@
-function calc_prewhitening_filter(signal)
-    Rxx = calc_variance_covariance(signal)
+function calc_prewhitening_filter(Rxx)
     F = eigen(Rxx)
     F.vectors * Diagonal(1 ./ sqrt.(F.values)) * F.vectors' .* sqrt(mean_power(F.values))
 end
 
-function calc_amplitude_filter(signal)
-    Rxx = calc_variance_covariance(signal)
+function calc_amplitude_filter(Rxx)
     F = eigen(Rxx)
     F.vectors * Diagonal(1 ./ F.values) * F.vectors' .* mean_power(F.values)
 end
@@ -14,8 +12,11 @@ function filter(filter_matrix::AbstractArray, signal::Array{Complex{Float64},2})
     signal * filter_matrix'
 end
 
-function calc_eigen_beamformer(signal)
-    Rxx = calc_variance_covariance(signal)
+function filter!(filter_matrix::AbstractArray, signal::Array{Complex{Float64},2})
+    signal .= signal * filter_matrix'
+end
+
+function calc_eigen_beamformer(Rxx)
     eigvecs(Rxx)[:,end]
 end
 

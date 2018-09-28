@@ -16,7 +16,8 @@ module PhasedArray
         filter,
         calc_prewhitening_filter,
         calc_amplitude_filter,
-        calc_eigen_beamformer
+        calc_eigen_beamformer,
+        calc_variance_covariance
 
     include("manifold.jl")
     include("plots.jl")
