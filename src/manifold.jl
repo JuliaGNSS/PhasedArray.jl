@@ -44,7 +44,7 @@ function manifold(lut::Array{Complex{Float64}, 3}, interpolation = Constant(), m
   lut_expanded[:,:,2:num_θs + 1] = lut
   lut_expanded[:,:,1] = lut[:,:,num_θs]
   lut_expanded[:,:,num_θs + 2] = lut[:,:,1]
-  itp = interpolate(lut_expanded, (NoInterp(), BSpline(interpolation), BSpline(interpolation)), OnGrid())
+  itp = interpolate(lut_expanded, (Interpolations.NoInterp(), BSpline(interpolation), BSpline(interpolation)))
   doa -> _get_steer_vec(doa, itp, res_ϕ, res_θ, num_θs, num_ants, max_el)
 end
 
@@ -54,7 +54,7 @@ function _get_steer_vec(doa::Spherical, itp_lut, res_ϕ, res_θ, num_θs, num_an
   ϕ = ϕ - (2 * ϕ) * (ϕ < 0) - (2 * (ϕ - π)) * (ϕ > π && max_el == π) - (ϕ - max_el) * (ϕ > max_el) # 0 <= ϕ <= max_el
   idx_ϕ = ϕ / res_ϕ + 1
   idx_θ = mod(θ / res_θ, num_θs) + 2
-  [itp_lut[ant,idx_ϕ,idx_θ]::Complex{Float64} for ant = 1:num_ants]
+  [itp_lut(ant,idx_ϕ,idx_θ)::Complex{Float64} for ant = 1:num_ants]
 end
 
 function _get_steer_vec(doa, itp_lut, res_ϕ, res_θ, num_θs, num_ants, max_el)

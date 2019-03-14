@@ -9,12 +9,14 @@ julia> steer_vec = manifold(0.1904 / 4 * [1 -1 1 -1; 1 1 -1 -1; 0 0 0 0], 157542
 julia> plot_pattern(steer_vec)
 ```
 """
-function plot_pattern(fig, position, get_steer_vec, reduce_ant_fun = norm, num_az = 360, num_el = 91)
+function plot_pattern(get_steer_vec, reduce_ant_fun = norm, num_az = 360, num_el = 91, fig = figure(), position = (1,1,1))
     azs, els, values = pattern_plotting_data(get_steer_vec, reduce_ant_fun, num_az, num_el)
     ax = draw_polar_axes(fig, position)
-    pattern_plot = ax[:pcolormesh](azs, els * 180 / π, values, cmap = get_cmap("jet"))
-    ax[:grid](true)
-    fig[:colorbar](pattern_plot, pad = 0.14)
+    pattern_plot = ax[:pcolormesh](azs, els * 180 / π, values)
+    ax[:grid](true, linestyle = "dashed")
+    cb = fig[:colorbar](pattern_plot, pad = 0.14)
+    cb[:set_label]("Normierte Leistung")
+    ax, azs, els, values
 end
 
 function pattern_plotting_data(get_steer_vec, reduce_ant_fun = norm, num_az = 360, num_el = 91)
