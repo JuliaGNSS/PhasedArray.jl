@@ -10,7 +10,7 @@ animate_pattern_data = init_animate_pattern_data(get_steer_vec)
 animate_pattern(figure(), (1,1,1), animate_pattern_data)
 ```
 """
-function animate_pattern(fig, position, animate_pattern_data)    
+function animate_pattern(fig, position, animate_pattern_data)
     azs, els, gains, sat_cn0, sat_doa, jammer_elevation = animate_pattern_data(0.0)
     ax = draw_polar_axes(fig, position)
     pattern_plot = ax[:pcolormesh](azs, els * 180 / π, gains, shading = "gouraud", cmap = get_cmap("jet"))
@@ -26,7 +26,7 @@ function animate_pattern(fig, position, animate_pattern_data)
 
     # Animate draws the i-th frame, where i starts at i=0 as in Python.
     function animate(i)
-        azs, els, gains, sat_cn0, sat_doa, jammer_elevation = animate_pattern_data(i * π / 180)     
+        azs, els, gains, sat_cn0, sat_doa, jammer_elevation = animate_pattern_data(i * π / 180)
         pattern_plot[:set_array](vec(gains'))
         jammer_plot[:set_offsets]([i * π / 180, 90 - jammer_elevation * 180 / π])
         snr_text[:set_text](@sprintf("CN0: %.1f dB-Hz", sat_cn0))
@@ -37,7 +37,7 @@ function animate_pattern(fig, position, animate_pattern_data)
     anim.FuncAnimation(fig, animate, init_func = init, frames = 360, repeat = false, interval = 45)
 end
 
-function animate_pattern(fig, position, animate_pattern_data, filename)    
+function animate_pattern(fig, position, animate_pattern_data, filename)
     animation = animate_pattern(fig, position, animate_pattern_data)
     animation[:save](filename, bitrate = -1, codec = "libx264", extra_args=["-pix_fmt", "yuv420p"])
 end
