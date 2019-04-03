@@ -56,13 +56,12 @@ end
     @test lut_expanded[:,:,2] == lut_expanded[:,:,12]
     @test lut_expanded[:,:,3] == lut_expanded[:,:,13]
     @test lut_expanded[:,:,4] == lut_expanded[:,:,14]
-    @test lut_expanded[:,1,:] == lut_expanded[:,5,:]
-    @test lut_expanded[:,2,:] == lut_expanded[:,4,:]
-    @test lut_expanded[:,14,:] == lut_expanded[:,10,:]
-    @test lut_expanded[:,13,:] == lut_expanded[:,11,:]
+    @test lut_expanded[:,1,3:12] == circshift(lut_expanded[:,5,3:12], (0,5))
+    @test lut_expanded[:,2,3:12] == circshift(lut_expanded[:,4,3:12], (0,5))
+    @test lut_expanded[:,14,3:12] == circshift(lut_expanded[:,10,3:12], (0,5))
+    @test lut_expanded[:,13,3:12] == circshift(lut_expanded[:,11,3:12], (0,5))
 
     @test PhasedArray.calc_expansion_length(Constant()) == 1
     @test PhasedArray.calc_expansion_length(Constant()) == 1
-    @test PhasedArray.calc_expansion_length(Quadratic(Reflect(OnCell()))) == 2
-    @test PhasedArray.calc_expansion_length(Cubic(Line(OnGrid()))) == 4
+    @test PhasedArray.calc_expansion_length(Quadratic(Reflect(OnCell()))) == 7
 end

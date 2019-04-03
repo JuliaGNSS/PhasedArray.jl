@@ -63,11 +63,7 @@ function calc_expansion_length(::Linear)
 end
 
 function calc_expansion_length(::Quadratic)
-    2
-end
-
-function calc_expansion_length(::Cubic)
-    4
+    7
 end
 
 function expand(lut, num::Int)
@@ -78,12 +74,12 @@ function expand(lut, num::Int)
     lut_expanded = Array{eltype(lut), 3}(undef, num_ants, num_ϕs + 2 * num, num_θs + 2 * num)
     lut_expanded[:,num + 1:num_ϕs + num,num + 1:num_θs + num] .= lut
     for i = 1:num
-        lut_expanded[:,:,num_θs + num + i] .= lut_expanded[:,:,num + i]
-        lut_expanded[:,:,num - i + 1] .= lut_expanded[:,:,num_θs + num - i + 1]
+        lut_expanded[:,num - i + 1,num + 1:num_θs + num] .= circshift(lut_expanded[:,num + i + 1,num + 1:num_θs + num], (0,floor(Int, num_θs / 2)))
+        lut_expanded[:,num_ϕs + num + i,num + 1:num_θs + num] .= circshift(lut_expanded[:,num_ϕs + num - i,num + 1:num_θs + num], (0,floor(Int, num_θs / 2)))
     end
     for i = 1:num
-        lut_expanded[:,num - i + 1,:] .= lut_expanded[:,num + i + 1,:]
-        lut_expanded[:,num_ϕs + num + i,:] .= lut_expanded[:,num_ϕs + num - i,:]
+        lut_expanded[:,:,num_θs + num + i] .= lut_expanded[:,:,num + i]
+        lut_expanded[:,:,num - i + 1] .= lut_expanded[:,:,num_θs + num - i + 1]
     end
     lut_expanded
 end
