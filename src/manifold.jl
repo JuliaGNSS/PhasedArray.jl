@@ -66,10 +66,6 @@ function calc_expansion_length(::Quadratic)
     7
 end
 
-function calc_expansion_length(::Cubic)
-    100
-end
-
 function expand(lut, num::Int)
     num >= 0 || error("Expand number must be greater than zero")
     num_ants = size(lut, 1)
@@ -77,7 +73,7 @@ function expand(lut, num::Int)
     num_θs = size(lut, 3)
     lut_expanded = Array{eltype(lut), 3}(undef, num_ants, num_ϕs + 2 * num, num_θs + 2 * num)
     lut_expanded[:,num + 1:num_ϕs + num,num + 1:num_θs + num] .= lut
-        for i = 1:num
+    for i = 1:num
         lut_expanded[:,num - i + 1,num + 1:num_θs + num] .= circshift(lut_expanded[:,num + i + 1,num + 1:num_θs + num], (0,floor(Int, num_θs / 2)))
         lut_expanded[:,num_ϕs + num + i,num + 1:num_θs + num] .= circshift(lut_expanded[:,num_ϕs + num - i,num + 1:num_θs + num], (0,floor(Int, num_θs / 2)))
     end
