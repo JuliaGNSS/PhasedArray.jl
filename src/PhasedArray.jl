@@ -1,26 +1,27 @@
 module PhasedArray
 
-    using Interpolations, CoordinateTransformations, Statistics, LinearAlgebra, Printf, PyCall, PyPlot
+    using Interpolations, CoordinateTransformations, LinearAlgebra, StaticArrays, Statistics, PGFPlotsX
     import Base.transpose, Base.filter
 
     export
-        manifold,
-        pattern_plotting_data,
-        plot_pattern,
-        pattern_3D_plotting_data,
-        plot_pattern_3D,
-        plot_manifold_3D,
-        draw_polar_axes,
-        init_animate_pattern_data,
-        animate_pattern,
+        IdealManifold,
+        RealManifold,
+        get_steer_vec,
+        Pattern,
+        Pattern3D,
         filter,
         calc_prewhitening_filter,
         calc_amplitude_filter,
         calc_eigen_beamformer,
         calc_variance_covariance
 
+    const cart2sph = SphericalFromCartesian()
+    const sph2cart = CartesianFromSpherical()
+
     include("manifold.jl")
-    include("plots.jl")
-    #include("animate_pattern.jl")
+    include("ideal_manifold.jl")
+    include("real_manifold.jl")
+    include("pattern.jl")
+    include("pgfplots.jl")
     include("filter.jl")
 end
