@@ -1,15 +1,3 @@
-@testset "Ideal manifold" begin
-    f_0 = 1575420e3
-    c₀ = 299_792_458
-    λ = c₀ / f_0
-    ant_pos = SVector(λ / 4 * SVector(1, 1, 0), λ / 4 * SVector(-1, 1, 0), λ / 4 * SVector(1, -1, 0), λ / 4 * SVector(-1, -1 , 0))
-    steer_vec = @inferred manifold(ant_pos, f_0)
-
-    @test @inferred(steer_vec(SVector(0,0,1))) ≈ [1, 1, 1, 1]
-    @test @inferred(steer_vec(SVector(0,1,0))) ≈ [1im, 1im, -1im, -1im]
-    @test @inferred(steer_vec(SVector(1,0,0))) ≈ [1im, -1im, 1im, -1im]
-end
-
 @testset "LUT manifold" begin
     λ = 0.1904
     ant_positions = SVector(λ / 4 * SVector(1, 1, 0), λ / 4 * SVector(-1, 1, 0), λ / 4 * SVector(1, -1, 0), λ / 4 * SVector(-1, -1 , 0))
@@ -18,11 +6,15 @@ end
     antenna_gain = 2
     sph2cart = CartesianFromSpherical()
     lut = map(ant_position -> [antenna_gain * cis(2 * π / λ * sph2cart(Spherical(1.0, θ * π / 180, π / 2 - ϕ * π / 180))' * ant_position) for ϕ=0:90, θ=0:359], ant_positions)
-    steer_vec = @inferred manifold(lut, Constant(), π / 2)
-    @test norm(@inferred(steer_vec(SphericalFromCartesian()(SVector(1, 1, 1))))) ≈ sqrt(num_ants)
-    @test @inferred(steer_vec(SphericalFromCartesian()(SVector(0,0,1)))) ≈ [1, 1, 1, 1]
-    @test @inferred(steer_vec(SphericalFromCartesian()(SVector(0,1,0)))) ≈ [1im, 1im, -1im, -1im]
-    @test @inferred(steer_vec(SphericalFromCartesian()(SVector(1,0,0)))) ≈ [1im, -1im, 1im, -1im]
+    manifold = @inferred RealManifold(lut, Constant(), π / 2)
+    @test norm(@inferred(get_steer_vec(manifold, SVector(1, 1, 1)))) ≈ sqrt(num_ants)
+    @test @inferred(get_steer_vec(manifold, SVector(0,0,1))) ≈ [1, 1, 1, 1]
+    @test @inferred(get_steer_vec(manifold, SVector(0,1,0))) ≈ [1im, 1im, -1im, -1im]
+    @test @inferred(get_steer_vec(manifold, SVector(1,0,0))) ≈ [1im, -1im, 1im, -1im]
+
+    @test @inferred(get_steer_vec(manifold, Spherical(1,0,0))) ≈ [1im, -1im, 1im, -1im]
+    @test @inferred(get_steer_vec(manifold, Spherical(1,0,0), RotXYZ(0.0,0.0,π/2))) ≈ [1im, 1im, -1im, -1im]
+    @test @inferred(get_steer_vec(manifold, SVector(1,0,0), RotXYZ(0.0,0.0,π/2))) ≈ [1im, 1im, -1im, -1im]
 end
 
 @testset "LUT manifold interpolated" begin
@@ -33,18 +25,18 @@ end
     antenna_gain = 2;
     sph2cart = CartesianFromSpherical()
     lut = map(ant_position -> [antenna_gain * cis(2 * π / λ * sph2cart(Spherical(1.0, θ * π / 180, π / 2 - ϕ * π / 180))' * ant_position) for ϕ=0:90, θ=0:359], ant_positions)
-    steer_vec = @inferred manifold(lut, Linear(), π / 2)
+    manifold = @inferred RealManifold(lut, Linear(), π / 2)
 
-    @test isapprox(norm(@inferred(steer_vec(SphericalFromCartesian()(SVector(1, 1, 1))))), sqrt(num_ants); rtol = 1e-4)
-    @test @inferred(steer_vec(SphericalFromCartesian()(SVector(0,0,1)))) ≈ [1, 1, 1, 1]
-    @test @inferred(steer_vec(SphericalFromCartesian()(SVector(0,1,0)))) ≈ [1im, 1im, -1im, -1im]
-    @test @inferred(steer_vec(SphericalFromCartesian()(SVector(1,0,0)))) ≈ [1im, -1im, 1im, -1im]
+    @test isapprox(norm(@inferred(get_steer_vec(manifold, SVector(1, 1, 1)))), sqrt(num_ants); rtol = 1e-4)
+    @test @inferred(get_steer_vec(manifold, SVector(0,0,1))) ≈ [1, 1, 1, 1]
+    @test @inferred(get_steer_vec(manifold, SVector(0,1,0))) ≈ [1im, 1im, -1im, -1im]
+    @test @inferred(get_steer_vec(manifold, SVector(1,0,0))) ≈ [1im, -1im, 1im, -1im]
 end
 
 @testset "Example LUT manifold" begin
     num_ants = length(EXAMPLE_LUT)
-    steer_vec = manifold(EXAMPLE_LUT)
-    @test norm(@inferred(steer_vec(SphericalFromCartesian()(SVector(0,0,1))))) < sqrt(num_ants)
+    manifold = RealManifold(EXAMPLE_LUT)
+    @test norm(@inferred(get_steer_vec(manifold, SVector(0,0,1)))) < sqrt(num_ants)
 end
 
 @testset "LUT expansion" begin

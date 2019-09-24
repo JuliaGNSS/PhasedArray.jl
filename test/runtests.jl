@@ -5,6 +5,7 @@ const EXAMPLE_LUT = SVector([-5.7078+9.35399im -2.5379+10.66im 0.880432+10.9225i
 
 Random.seed!(1234)
 
-include("manifold.jl")
+include("ideal_manifold.jl")
+include("real_manifold.jl")
 include("pattern.jl")
 include("filter.jl")

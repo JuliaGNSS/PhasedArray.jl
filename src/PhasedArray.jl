@@ -4,10 +4,11 @@ module PhasedArray
     import Base.transpose, Base.filter
 
     export
-        manifold,
+        IdealManifold,
+        RealManifold,
+        get_steer_vec,
         Pattern,
         Pattern3D,
-        plot,
         filter,
         calc_prewhitening_filter,
         calc_amplitude_filter,
@@ -18,6 +19,8 @@ module PhasedArray
     const sph2cart = CartesianFromSpherical()
 
     include("manifold.jl")
+    include("ideal_manifold.jl")
+    include("real_manifold.jl")
     include("pattern.jl")
     include("pgfplots.jl")
     include("filter.jl")
