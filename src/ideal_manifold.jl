@@ -21,6 +21,10 @@ function get_steer_vec(manifold::IdealManifold, doa)
     map(scaled_antenna_position -> cis(scaled_antenna_position' * doa), manifold.scaled_antenna_positions)
 end
 
+function IdealManifold()
+    IdealManifold(SVector{1, SVector{3, Float64}}(SVector(0.0,0.0,0.0)), 0.0)
+end
+
 function get_steer_vec(manifold::IdealManifold{1}, doa)
     1.0
 end
