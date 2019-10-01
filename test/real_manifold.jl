@@ -7,6 +7,7 @@
     sph2cart = CartesianFromSpherical()
     lut = map(ant_position -> [antenna_gain * cis(2 * π / λ * sph2cart(Spherical(1.0, θ * π / 180, π / 2 - ϕ * π / 180))' * ant_position) for ϕ=0:90, θ=0:359], ant_positions)
     manifold = @inferred RealManifold(lut, Constant(), π / 2)
+    @test typeof(manifold) <: AbstractManifold{4}
     @test norm(@inferred(get_steer_vec(manifold, SVector(1, 1, 1)))) ≈ sqrt(num_ants)
     @test @inferred(get_steer_vec(manifold, SVector(0,0,1))) ≈ [1, 1, 1, 1]
     @test @inferred(get_steer_vec(manifold, SVector(0,1,0))) ≈ [1im, 1im, -1im, -1im]
@@ -26,6 +27,7 @@ end
     sph2cart = CartesianFromSpherical()
     lut = map(ant_position -> [antenna_gain * cis(2 * π / λ * sph2cart(Spherical(1.0, θ * π / 180, π / 2 - ϕ * π / 180))' * ant_position) for ϕ=0:90, θ=0:359], ant_positions)
     manifold = @inferred RealManifold(lut, Linear(), π / 2)
+    @test typeof(manifold) <: AbstractManifold{4}
 
     @test isapprox(norm(@inferred(get_steer_vec(manifold, SVector(1, 1, 1)))), sqrt(num_ants); rtol = 1e-4)
     @test @inferred(get_steer_vec(manifold, SVector(0,0,1))) ≈ [1, 1, 1, 1]
@@ -36,6 +38,7 @@ end
 @testset "Example LUT manifold" begin
     num_ants = length(EXAMPLE_LUT)
     manifold = RealManifold(EXAMPLE_LUT)
+    @test typeof(manifold) <: AbstractManifold{2}
     @test norm(@inferred(get_steer_vec(manifold, SVector(0,0,1)))) < sqrt(num_ants)
 end
 
