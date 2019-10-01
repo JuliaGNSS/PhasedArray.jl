@@ -1,4 +1,4 @@
-abstract type AbstractManifold end
+abstract type AbstractManifold{N} end
 
 function get_steer_vec(manifold, doa, attitude)
     get_steer_vec(manifold, attitude * doa)

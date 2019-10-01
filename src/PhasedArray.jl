@@ -6,6 +6,7 @@ module PhasedArray
     export
         IdealManifold,
         RealManifold,
+        AbstractManifold,
         get_steer_vec,
         Pattern,
         Pattern3D,

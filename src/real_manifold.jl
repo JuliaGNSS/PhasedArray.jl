@@ -1,11 +1,11 @@
-struct RealManifold{Q, T <: AbstractInterpolation} <: AbstractManifold
+struct RealManifold{N, T <: AbstractInterpolation} <: AbstractManifold{N}
     num_azimuth_angles::Int
     num_elevation_angles::Int
     azimuth_step::Float64
     elevation_step::Float64
     max_elevation::Float64
     expansion_length::Int
-    lut::SVector{Q, T}
+    lut::SVector{N, T}
 end
 
 """
@@ -21,7 +21,7 @@ Possible values are: `Constant()`, `Linear()`, `Quadratic(Reflect(OnCell()))`
 or `Cubic(Reflect(OnCell()))`. For more information see regarding the
 interpolation, see: https://github.com/JuliaMath/Interpolations.jl.
 """
-function RealManifold(lut::SVector{Q, Array{Complex{Float64}, 2}}, interpolation = Constant(), max_elevation = 1π) where Q
+function RealManifold(lut::SVector{N, Array{Complex{Float64}, 2}}, interpolation = Constant(), max_elevation = 1π) where N
     test_lut_correctness(lut, max_elevation)
     num_elevation_angles = size(lut[1], 1)
     num_azimuth_angles = size(lut[1], 2)
@@ -63,13 +63,13 @@ function calc_expansion_length(::Quadratic)
     7
 end
 
-function expand(lut::SVector{Q, Array{Complex{Float64}, 2}}, num_expand::Int) where Q
+function expand(lut::SVector{N, Array{Complex{Float64}, 2}}, num_expand::Int) where N
     num_expand >= 0 || error("Expand number must be greater than zero")
     num_ϕs = size(lut[1], 1)
     num_θs = size(lut[1], 2)
     lut_expanded = map(X -> Matrix{eltype(eltype(lut))}(undef, num_ϕs + 2 * num_expand, num_θs + 2 * num_expand), lut)
     foreach((X, Y) -> X[num_expand + 1:num_ϕs + num_expand,num_expand + 1:num_θs + num_expand] .= Y, lut_expanded, lut)
-    for ant = 1:Q
+    for ant = 1:N
         for i = 1:num_expand
             lut_expanded[ant][num_expand - i + 1,num_expand + 1:num_θs + num_expand] .= circshift(lut_expanded[ant][num_expand + i + 1,num_expand + 1:num_θs + num_expand], floor(Int, num_θs / 2))
             lut_expanded[ant][num_ϕs + num_expand + i,num_expand + 1:num_θs + num_expand] .= circshift(lut_expanded[ant][num_ϕs + num_expand - i,num_expand + 1:num_θs + num_expand], floor(Int, num_θs / 2))
@@ -87,20 +87,20 @@ end
 
 Normalizes the manifold such that the maximal norm is `sqrt(num_ants)`.
 """
-function norm_manifold(lut::SVector{Q, Array{Complex{Float64}, 2}}) where Q
+function norm_manifold(lut::SVector{N, Array{Complex{Float64}, 2}}) where N
     max_gain = 0.0
     length_lut = length(lut[1])
     for j = 1:length_lut
         current_gain = 0.0
-        for i = 1:Q
+        for i = 1:N
             current_gain += abs2(lut[i][j])
         end
         max_gain = max(max_gain, current_gain)
     end
-    map(X -> X ./ sqrt(max_gain / Q), lut)
+    map(X -> X ./ sqrt(max_gain / N), lut)
 end
 
-function test_lut_correctness(lut::SVector{Q, Array{Complex{Float64}, 2}}, max_el) where Q
+function test_lut_correctness(lut::SVector{N, Array{Complex{Float64}, 2}}, max_el) where N
     num_els = size(lut[1], 1)
     near_horizont_index = num_els * (max_el < π / 2) + floor(Int, π / 2 / max_el * num_els) * (max_el >= π / 2)
     lut_reference_one = map(X -> X ./ lut[1], lut[2:end])
