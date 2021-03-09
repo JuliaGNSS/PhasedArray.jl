@@ -8,8 +8,6 @@
     Rxx = calc_variance_covariance(test_signal)
     pre_whitening_filter = calc_prewhitening_filter(Rxx)
     @test pre_whitening_filter ≈ I atol = 0.1
-
-    @test filter(Matrix{Complex{Float64}}(I, 2, 2), test_signal) == test_signal
 end
 
 @testset "Amplitude filter" begin

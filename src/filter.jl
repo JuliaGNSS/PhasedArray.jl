@@ -8,14 +8,6 @@ function calc_amplitude_filter(Rxx)
     F.vectors * Diagonal(1 ./ F.values) * F.vectors' .* mean_power(F.values)
 end
 
-function filter(filter_matrix::AbstractArray, signal::AbstractArray)
-    signal * filter_matrix'
-end
-
-function filter!(filter_matrix::AbstractArray, signal::AbstractArray)
-    signal .= signal * filter_matrix'
-end
-
 function calc_eigen_beamformer(Rxx)
     eigvecs(Rxx)[:,end]
 end

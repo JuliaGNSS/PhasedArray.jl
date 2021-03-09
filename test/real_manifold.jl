@@ -1,3 +1,10 @@
+@testset "Normalize LUT" begin
+    lut = SVector(complex.(ones(4,4), ones(4,4)) * 3, complex.(ones(4,4), ones(4,4)) * 2)
+    normalized_lut = @inferred PhasedArray.norm_manifold(lut)
+    @test normalized_lut[1] ≈ complex.(ones(4,4), ones(4,4)) * 3 / sqrt(26 / 2)
+    @test normalized_lut[2] ≈ complex.(ones(4,4), ones(4,4)) * 2 / sqrt(26 / 2)
+end
+
 @testset "LUT manifold" begin
     λ = 0.1904
     ant_positions = SVector(λ / 4 * SVector(1, 1, 0), λ / 4 * SVector(-1, 1, 0), λ / 4 * SVector(1, -1, 0), λ / 4 * SVector(-1, -1 , 0))
@@ -6,7 +13,18 @@
     antenna_gain = 2
     sph2cart = CartesianFromSpherical()
     lut = map(ant_position -> [antenna_gain * cis(2 * π / λ * sph2cart(Spherical(1.0, θ * π / 180, π / 2 - ϕ * π / 180))' * ant_position) for ϕ=0:90, θ=0:359], ant_positions)
-    manifold = @inferred RealManifold(lut, Constant(), π / 2)
+    manifold = @inferred RealManifold(lut, max_elevation = π / 2)
+    @test typeof(manifold) <: AbstractManifold{4}
+    @test norm(@inferred(get_steer_vec(manifold, SVector(1, 1, 1)))) ≈ sqrt(num_ants)
+    @test @inferred(get_steer_vec(manifold, SVector(0,0,1))) ≈ [1, 1, 1, 1]
+    @test @inferred(get_steer_vec(manifold, SVector(0,1,0))) ≈ [1im, 1im, -1im, -1im]
+    @test @inferred(get_steer_vec(manifold, SVector(1,0,0))) ≈ [1im, -1im, 1im, -1im]
+
+    @test @inferred(get_steer_vec(manifold, Spherical(1,0,0))) ≈ [1im, -1im, 1im, -1im]
+    @test @inferred(get_steer_vec(manifold, Spherical(1,0,0), RotXYZ(0.0,0.0,π/2))) ≈ [1im, 1im, -1im, -1im]
+    @test @inferred(get_steer_vec(manifold, SVector(1,0,0), RotXYZ(0.0,0.0,π/2))) ≈ [1im, 1im, -1im, -1im]
+
+    manifold = @inferred RealManifold(lut[1], lut[2], lut[3], lut[4], max_elevation = π / 2)
     @test typeof(manifold) <: AbstractManifold{4}
     @test norm(@inferred(get_steer_vec(manifold, SVector(1, 1, 1)))) ≈ sqrt(num_ants)
     @test @inferred(get_steer_vec(manifold, SVector(0,0,1))) ≈ [1, 1, 1, 1]
@@ -26,7 +44,7 @@ end
     antenna_gain = 2;
     sph2cart = CartesianFromSpherical()
     lut = map(ant_position -> [antenna_gain * cis(2 * π / λ * sph2cart(Spherical(1.0, θ * π / 180, π / 2 - ϕ * π / 180))' * ant_position) for ϕ=0:90, θ=0:359], ant_positions)
-    manifold = @inferred RealManifold(lut, Linear(), π / 2)
+    manifold = @inferred RealManifold(lut, interpolation = Linear(), max_elevation = π / 2)
     @test typeof(manifold) <: AbstractManifold{4}
 
     @test isapprox(norm(@inferred(get_steer_vec(manifold, SVector(1, 1, 1)))), sqrt(num_ants); rtol = 1e-4)
