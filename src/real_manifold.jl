@@ -21,17 +21,21 @@ Possible values are: `Constant()`, `Linear()`, `Quadratic(Reflect(OnCell()))`
 or `Cubic(Reflect(OnCell()))`. For more information see regarding the
 interpolation, see: https://github.com/JuliaMath/Interpolations.jl.
 """
-function RealManifold(lut::SVector{N, Array{Complex{Float64}, 2}}, interpolation = Constant(), max_elevation = 1π) where N
+function RealManifold(lut::SVector{N, <: AbstractMatrix{Complex{T}}}; interpolation::Q = Constant(), max_elevation = 1π, normalize = true) where {N, Q, T <: Real}
     test_lut_correctness(lut, max_elevation)
     num_elevation_angles = size(lut[1], 1)
     num_azimuth_angles = size(lut[1], 2)
     elevation_step = max_elevation / (num_elevation_angles - 1)
     azimuth_step = 2 * π / num_azimuth_angles
-    normalized_lut = norm_manifold(lut)
+    normalized_lut = normalize ? norm_manifold(lut) : lut
     expansion_length = calc_expansion_length(interpolation)
     expanded_lut = expand(normalized_lut, expansion_length)
     interpolated_lut = map(X -> interpolate(X, (BSpline(interpolation), BSpline(interpolation))), expanded_lut)
-    RealManifold(num_azimuth_angles, num_elevation_angles, azimuth_step, elevation_step, max_elevation, expansion_length, interpolated_lut)
+    RealManifold{N, eltype(interpolated_lut)}(num_azimuth_angles, num_elevation_angles, azimuth_step, elevation_step, max_elevation, expansion_length, interpolated_lut)
+end
+
+function RealManifold(lut::AbstractMatrix{Complex{T}}...; interpolation = Constant(), max_elevation = 1π, normalize = true) where T <: Real
+    RealManifold(SVector(lut), interpolation = interpolation, max_elevation = max_elevation, normalize = normalize)
 end
 
 function get_steer_vec(manifold::RealManifold, doa::Spherical)
@@ -39,9 +43,9 @@ function get_steer_vec(manifold::RealManifold, doa::Spherical)
     # Rotate azimuth by 180° if elevation is less than zero or greater than π
     azimuth = doa.θ + π * ((elevation < 0) || (elevation > π))
     # Convey the elevation in between 0 <= ϕ <= max_elevation
-    elevation -= (elevation < 0) * (2 * elevation)
-        + (elevation > π && manifold.max_elevation ≈ π) * (2 * (elevation - π))
-        + (elevation > manifold.max_elevation) * (elevation - manifold.max_elevation)
+    elevation -= (elevation < 0) * (2 * elevation) +
+        (elevation > π && manifold.max_elevation ≈ π) * (2 * (elevation - π)) +
+        (elevation > manifold.max_elevation) * (elevation - manifold.max_elevation)
     elevation_index = elevation / manifold.elevation_step + 1 + manifold.expansion_length
     azimuth_index = mod(azimuth / manifold.azimuth_step, manifold.num_azimuth_angles) + 1 + manifold.expansion_length
     map(X -> X(elevation_index,azimuth_index), manifold.lut)
@@ -63,7 +67,7 @@ function calc_expansion_length(::Quadratic)
     7
 end
 
-function expand(lut::SVector{N, Array{Complex{Float64}, 2}}, num_expand::Int) where N
+function expand(lut::SVector{N, <: AbstractMatrix{Complex{T}}}, num_expand::Int) where {N, T <: Real}
     num_expand >= 0 || error("Expand number must be greater than zero")
     num_ϕs = size(lut[1], 1)
     num_θs = size(lut[1], 2)
@@ -87,15 +91,14 @@ end
 
 Normalizes the manifold such that the maximal norm is `sqrt(num_ants)`.
 """
-function norm_manifold(lut::SVector{N, Array{Complex{Float64}, 2}}) where N
-    max_gain = 0.0
+function norm_manifold(lut::SVector{N, <: AbstractMatrix{Complex{T}}}) where {N, T <: Real}
     length_lut = length(lut[1])
-    for j = 1:length_lut
+    max_gain = mapreduce(max, 1:length_lut) do j
         current_gain = 0.0
-        for i = 1:N
+        @inbounds for i = 1:N
             current_gain += abs2(lut[i][j])
         end
-        max_gain = max(max_gain, current_gain)
+        current_gain
     end
     map(X -> X ./ sqrt(max_gain / N), lut)
 end
