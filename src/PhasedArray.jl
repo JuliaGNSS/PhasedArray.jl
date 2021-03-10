@@ -1,7 +1,12 @@
 module PhasedArray
 
-    using Interpolations, CoordinateTransformations, LinearAlgebra, StaticArrays, Statistics, JuliennedArrays
-    import Base.transpose, Base.filter
+    using
+        Interpolations,
+        CoordinateTransformations,
+        LinearAlgebra,
+        StaticArrays,
+        Statistics,
+        JuliennedArrays
 
     export
         IdealManifold,
@@ -10,7 +15,6 @@ module PhasedArray
         get_steer_vec,
         Pattern,
         Pattern3D,
-        filter,
         calc_prewhitening_filter,
         calc_amplitude_filter,
         calc_eigen_beamformer,
