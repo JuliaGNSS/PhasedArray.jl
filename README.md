@@ -46,7 +46,7 @@ The interpolation can be set with the interpolation argument. The default one is
 
 By default the LUT is normalized to its highest gain. If you don't want that, you can pass the argument `normalize = false` to the `RealManifold` function. 
 
-The function `get_steer_vec` has an optional third argument for a rotation matrix, if you'd like to rotate the Direction of Arrival (DoA) bevor looking up the steering vector.
+The function `get_steer_vec` has an optional third argument for a rotation matrix, if you'd like to rotate the Direction of Arrival (DoA) before looking up the steering vector.
 
 ## Plotting
 
