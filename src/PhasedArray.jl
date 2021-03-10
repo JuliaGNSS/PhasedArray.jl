@@ -1,6 +1,6 @@
 module PhasedArray
 
-    using Interpolations, CoordinateTransformations, LinearAlgebra, StaticArrays, Statistics, PGFPlotsX
+    using Interpolations, CoordinateTransformations, LinearAlgebra, StaticArrays, Statistics, PGFPlotsX, JuliennedArrays
     import Base.transpose, Base.filter
 
     export
@@ -18,6 +18,9 @@ module PhasedArray
 
     const cart2sph = SphericalFromCartesian()
     const sph2cart = CartesianFromSpherical()
+
+    struct NumAnts{N} end
+    NumAnts(N) = NumAnts{N}()
 
     include("manifold.jl")
     include("ideal_manifold.jl")

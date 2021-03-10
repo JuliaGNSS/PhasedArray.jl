@@ -22,7 +22,7 @@ function IdealManifold(f_0, antenna_positions::SVector{3,T}...; c0 = 299_792_458
 end
 
 function get_steer_vec(manifold::IdealManifold, doa)
-    map(scaled_antenna_position -> cis(scaled_antenna_position' * doa), manifold.scaled_antenna_positions)
+    map(scaled_antenna_position -> cis(transpose(scaled_antenna_position) * doa), manifold.scaled_antenna_positions)
 end
 
 function IdealManifold()
