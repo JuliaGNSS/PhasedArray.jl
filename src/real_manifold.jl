@@ -72,12 +72,16 @@ function get_steer_vec(manifold::RealManifold{N}, doa::Spherical) where N
     elevation = π / 2 - doa.ϕ # convert to mathematic
     # Rotate azimuth by 180° if elevation is less than zero or greater than π
     azimuth = doa.θ + π * ((elevation < 0) || (elevation > π))
-    # Convey the elevation in between 0 <= ϕ <= max_elevation
+    # Convey the elevation in between 0 <= ϕ <= π
     elevation -= (elevation < 0) * (2 * elevation) +
-        (elevation > π && manifold.max_elevation ≈ π) * (2 * (elevation - π)) +
-        (elevation > manifold.max_elevation) * (elevation - manifold.max_elevation)
+        (elevation > π && manifold.max_elevation ≈ π) * (2 * (elevation - π))
+    elevation > manifold.max_elevation && error("Elevation is above max elevation. Try to increase max elevation.")
     elevation_index = elevation / manifold.elevation_step + 1 + manifold.expansion_length
     azimuth_index = mod(azimuth / manifold.azimuth_step, manifold.num_azimuth_angles) + 1 + manifold.expansion_length
+    get_steer_vec(manifold, azimuth_index, elevation_index)
+end
+
+function get_steer_vec(manifold::RealManifold{N}, azimuth_index::Real, elevation_index::Real) where N
     steer_vec = MVector{N, ComplexF64}(undef)
     @inbounds for i = 1:length(steer_vec)
         steer_vec[i] = manifold.lut(i, elevation_index, azimuth_index)
@@ -85,8 +89,16 @@ function get_steer_vec(manifold::RealManifold{N}, doa::Spherical) where N
     SVector(steer_vec)
 end
 
+# See this issue: https://github.com/JuliaGeometry/CoordinateTransformations.jl/issues/25
+# if you'd like to know the direction of θ and ϕ
 function get_steer_vec(manifold::RealManifold, doa)
-    get_steer_vec(manifold, cart2sph(doa))
+    doa_sph = cart2sph(doa) # θ can be between -π and π
+    elevation = π / 2 - doa_sph.ϕ # convert to mathematic
+    elevation > manifold.max_elevation && error("Elevation is above max elevation. Try to increase max elevation.")
+    azimuth = doa_sph.θ + 2π * (doa_sph.θ < 0)
+    elevation_index = elevation / manifold.elevation_step + 1 + manifold.expansion_length
+    azimuth_index = azimuth / manifold.azimuth_step + 1 + manifold.expansion_length
+    get_steer_vec(manifold, azimuth_index, elevation_index)
 end
 
 function calc_expansion_length(::Type{<:Interpolations.Degree})
