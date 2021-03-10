@@ -36,7 +36,7 @@ or you can create a real manifold based on a measured LUT:
 
 ```julia
 using PhasedArray, StaticArrays
-manifold = RealManifold(lut, NumAnts(4))
+manifold = RealManifold(lut, PhasedArray.NumAnts(4))
 steer_vec = get_steer_vec(manifold, SVector(0, 0, 1))
 ```
 The LUT can either be a 3D Array, where the first dimension holds the antenna channels, the second dimension the elevations and the third dimension the azimuths, or it can be a `SVector` of a matrices, where each matrix holds the elevations on the first dimension and the azimuths on the second dimension per antenna channel.
