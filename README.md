@@ -19,16 +19,20 @@ Pkg.add("git@git.rwth-aachen.de:nav/PhasedArray.jl.git")
 
 ## Usage
 
-Ideal manifold
+### Ideal manifold
+You can either create an ideal manifold based on antenna positions and center frequency
 ```julia
 using PhasedArray, StaticArrays
-ant_pos = 0.1904 / 4 * @SMatrix [1 -1 1 -1; 1 1 -1 -1; 0 0 0 0]
-manifold = IdealManifold(1575420e3, ant_pos)
-doa = @SVector [0,0,1]
+antenna_positions = 0.1904 / 4 *
+    @SMatrix [1 -1  1 -1;
+              1  1 -1 -1;
+              0  0  0  0]
+manifold = IdealManifold(1575420e3, antenna_positions)
+doa = @SVector [0, 0, 1]
 steer_vec = get_steer_vec(manifold, doa)
 ```
-
-or real manifold based on a LUT:
+### Real manifold
+or you can create a real manifold based on a measured LUT:
 
 ```julia
 using PhasedArray, StaticArrays
