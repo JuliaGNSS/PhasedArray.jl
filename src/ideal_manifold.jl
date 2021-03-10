@@ -1,5 +1,5 @@
-struct IdealManifold{N} <: AbstractManifold{N}
-    scaled_antenna_positions::SVector{N,SVector{3,Float64}}
+struct IdealManifold{N, T <: SMatrix{3,N}} <: AbstractManifold{N}
+    scaled_antenna_positions::T
 end
 
 """
@@ -12,9 +12,13 @@ julia> get_steer_vec(manifold, SVector(0.0,0.0,1.0))
 julia> get_steer_vec(manifold, SVector(0.0,0.0,1.0), RotXYZ(0.0,0.0,0.0))
 ```
 """
-function IdealManifold(f_0, antenna_positions::SVector{N,SVector{3,T}}; c0 = 299_792_458) where {N, T <: Real}
+function IdealManifold(f_0, antenna_positions::SMatrix{3,N,T}; c0 = 299_792_458) where {N, T <: Real}
     λ = c0 / f_0
-    IdealManifold(map(antenna_position -> 2π / λ * antenna_position, antenna_positions))
+    IdealManifold(2π / λ * antenna_positions)
+end
+
+function IdealManifold(f_0, antenna_positions::SVector{N,SVector{3,T}}; c0 = 299_792_458) where {N, T <: Real}
+    IdealManifold(f_0, reduce(hcat, antenna_positions), c0 = c0)
 end
 
 function IdealManifold(f_0, antenna_positions::SVector{3,T}...; c0 = 299_792_458) where T <: Real
@@ -22,11 +26,11 @@ function IdealManifold(f_0, antenna_positions::SVector{3,T}...; c0 = 299_792_458
 end
 
 function get_steer_vec(manifold::IdealManifold, doa)
-    map(scaled_antenna_position -> cis(transpose(scaled_antenna_position) * doa), manifold.scaled_antenna_positions)
+    cis.(transpose(manifold.scaled_antenna_positions) * doa)
 end
 
 function IdealManifold()
-    IdealManifold(0.0, SVector{1, SVector{3, Float64}}(SVector(0.0,0.0,0.0)))
+    IdealManifold(zeros(SMatrix{3, 1, Float64}))
 end
 
 function get_steer_vec(manifold::IdealManifold{1}, doa)

@@ -25,6 +25,17 @@
     @test @inferred(get_steer_vec(manifold, Spherical(1.0, 0.0, 0.0), RotXYZ(0.0,0.0,π/2))) ≈ [1im, 1im, -1im, -1im]
     @test @inferred(get_steer_vec(manifold, SVector(1,0,0), RotXYZ(0.0,0.0,π/2))) ≈ [1im, 1im, -1im, -1im]
 
+    manifold = @inferred IdealManifold(f_0, λ / 4 * @SMatrix([1 -1 1 -1; 1 1 -1 -1; 0 0 0 0]))
+
+    @test typeof(manifold) <: AbstractManifold{4}
+    @test @inferred(get_steer_vec(manifold, SVector(0,0,1))) ≈ [1, 1, 1, 1]
+    @test @inferred(get_steer_vec(manifold, SVector(0,1,0))) ≈ [1im, 1im, -1im, -1im]
+    @test @inferred(get_steer_vec(manifold, SVector(1,0,0))) ≈ [1im, -1im, 1im, -1im]
+
+    @test @inferred(get_steer_vec(manifold, Spherical(1.0, 0.0, 0.0))) ≈ [1im, -1im, 1im, -1im]
+    @test @inferred(get_steer_vec(manifold, Spherical(1.0, 0.0, 0.0), RotXYZ(0.0,0.0,π/2))) ≈ [1im, 1im, -1im, -1im]
+    @test @inferred(get_steer_vec(manifold, SVector(1,0,0), RotXYZ(0.0,0.0,π/2))) ≈ [1im, 1im, -1im, -1im]
+
     manifold = @inferred IdealManifold()
     @test typeof(manifold) <: AbstractManifold{1}
     @test @inferred(get_steer_vec(manifold, SVector(1,0,0))) == 1.0

@@ -1,6 +1,6 @@
 module PhasedArray
 
-    using Interpolations, CoordinateTransformations, LinearAlgebra, StaticArrays, Statistics, PGFPlotsX, JuliennedArrays
+    using Interpolations, CoordinateTransformations, LinearAlgebra, StaticArrays, Statistics, JuliennedArrays
     import Base.transpose, Base.filter
 
     export
@@ -26,6 +26,5 @@ module PhasedArray
     include("ideal_manifold.jl")
     include("real_manifold.jl")
     include("pattern.jl")
-    include("pgfplots.jl")
     include("filter.jl")
 end
