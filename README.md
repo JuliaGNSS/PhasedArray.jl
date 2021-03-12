@@ -61,7 +61,13 @@ pattern = Pattern(manifold, reduce_ant_function, num_az = 360, num_el = 91, max_
 ```
 The `reduce_ant_function` can be any function, that reduces the antenna channels to a scalar real value.
 
-This pattern can be plotted with PGFPlotsX in the follwing way:
+This pattern can be plotted with Plots.jl in the following way:
+```julia
+using Plots
+plot(pattern)
+```
+
+Alternatively you can plot it with PGFPlotsX:
 ```julia
 using PGFPlotsX
 @pgf PolarAxis(
@@ -86,7 +92,15 @@ If you'd like to plot a 3D figure, this can be done with the following code:
 reduce_ant_function = norm
 pattern = Pattern3D(manifold, reduce_ant_function, num_az = 360, num_el = 181, max_el = π)
 ```
-Again, this can be plotted with PGFPlotsX in the following way:
+Again, this can be plotted with Plots.jl:
+```julia
+using Plots
+plot(pattern)
+# If you use plotlyjs() you can also plot the gain correctly:
+# plot(pattern, fill_z = pattern.gains)
+```
+
+Alternatively you can plots the pattern with PGFPlotsX in the following way:
 ```julia
 using PGFPlotsX
 @pgf Axis({"colormap/viridis"},

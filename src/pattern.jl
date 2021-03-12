@@ -24,6 +24,15 @@ function Pattern(manifold, reduce_ant_fun = norm; num_az = 360, num_el = 91, max
     Pattern(azs, els, values, max_el)
 end
 
+@recipe function f(pattern::Pattern;)
+    seriestype := :heatmap
+    seriescolor --> :viridis
+    colorbar_title --> "Magnitude"
+    projection --> :polar
+    ylims --> (0, pattern.max_el)
+    pattern.azs, pattern.els, pattern.values
+end
+
 function Pattern3D(manifold, reduce_ant_fun = norm; num_az = 360, num_el = 181, max_el = π)
     azs = range(0, stop = 2 * π, length = num_az)
     els = range(0, stop = max_el, length = num_el)
@@ -35,4 +44,10 @@ function Pattern3D(manifold, reduce_ant_fun = norm; num_az = 360, num_el = 181, 
     Y = map(doa -> doa[2], scaled_doas_cart)
     Z = map(doa -> doa[3], scaled_doas_cart)
     Pattern3D(X, Y, Z, gains, Float64(max_el))
+end
+
+@recipe function f(pattern::Pattern3D;)
+    seriestype := :surface
+    seriescolor --> :viridis
+    pattern.X, pattern.Y, pattern.Z
 end
