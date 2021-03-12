@@ -6,7 +6,8 @@ module PhasedArray
         LinearAlgebra,
         StaticArrays,
         Statistics,
-        JuliennedArrays
+        JuliennedArrays,
+        RecipesBase
 
     export
         IdealManifold,
