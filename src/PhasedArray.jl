@@ -19,7 +19,8 @@ module PhasedArray
         calc_prewhitening_filter,
         calc_amplitude_filter,
         calc_eigen_beamformer,
-        calc_variance_covariance
+        calc_variance_covariance,
+        get_num_ants
 
     const cart2sph = SphericalFromCartesian()
     const sph2cart = CartesianFromSpherical()
