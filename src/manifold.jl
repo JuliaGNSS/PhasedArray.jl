@@ -7,3 +7,5 @@ end
 function get_steer_vec(manifold, doa::Spherical, attitude)
     get_steer_vec(manifold, sph2cart(doa), attitude)
 end
+
+get_num_ants(::AbstractManifold{N}) where N = N
