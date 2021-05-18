@@ -25,7 +25,7 @@ function IdealManifold(f_0, antenna_positions::SVector{3,T}...; c0 = 299_792_458
     IdealManifold(f_0, SVector(antenna_positions), c0 = c0)
 end
 
-function IdealManifold(f_0, antenna_positions::SVector{3,T}; c0 = 299_792_458)
+function IdealManifold(f_0, antenna_positions::SVector{3,T}; c0 = 299_792_458) where T <: Real
     IdealManifold(f_0, SMatrix(antenna_positions), c0 = c0)
 end
 
