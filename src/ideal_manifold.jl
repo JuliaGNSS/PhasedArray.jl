@@ -25,6 +25,25 @@ function IdealManifold(f_0, antenna_positions::SVector{3,T}...; c0 = 299_792_458
     IdealManifold(f_0, SVector(antenna_positions), c0 = c0)
 end
 
+function IdealManifold(f_0, num_ant_x, num_ant_y, dist_x, dist_y; kwargs...)
+    max_x = (num_ant_x - 1) / 2
+    max_y = (num_ant_y - 1) / 2
+    pos_x = (-max_x:max_x) .* dist_x
+    pos_y = (-max_y:max_y) .* dist_y
+    ant_pos = SMatrix{3, num_ant_x * num_ant_y}(
+        vcat(
+            repeat(pos_x, outer = num_ant_y)',
+            repeat(pos_y, inner = num_ant_x)',
+            zeros(1, num_ant_x * num_ant_y)
+        )
+    )
+    IdealManifold(f_0, ant_pos; kwargs...)
+end
+
+function IdealManifold(f_0, num_ant_xy, dist_xy; kwargs...)
+    IdealManifold(f_0, num_ant_xy, num_ant_xy, dist_xy, dist_xy; kwargs...)
+end
+
 function get_steer_vec(manifold::IdealManifold, doa)
     cis.(transpose(manifold.scaled_antenna_positions) * doa)
 end
