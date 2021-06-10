@@ -3,6 +3,7 @@ module PhasedArray
     using
         Interpolations,
         CoordinateTransformations,
+        DocStringExtensions,
         LinearAlgebra,
         StaticArrays,
         Statistics,
@@ -20,6 +21,7 @@ module PhasedArray
         calc_amplitude_filter,
         calc_eigen_beamformer,
         calc_variance_covariance,
+        doa_music,
         get_num_ants
 
     const cart2sph = SphericalFromCartesian()
@@ -29,6 +31,7 @@ module PhasedArray
     NumAnts(N) = NumAnts{N}()
 
     include("manifold.jl")
+    include("doa.jl")
     include("ideal_manifold.jl")
     include("real_manifold.jl")
     include("pattern.jl")
