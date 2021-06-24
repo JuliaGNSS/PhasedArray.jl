@@ -1,5 +1,6 @@
-[![pipeline status](https://git.rwth-aachen.de/nav/PhasedArray.jl/badges/master/pipeline.svg)](https://git.rwth-aachen.de/nav/PhasedArray.jl/commits/master)
-[![coverage report](https://git.rwth-aachen.de/nav/PhasedArray.jl/badges/master/coverage.svg)](https://git.rwth-aachen.de/nav/PhasedArray.jl/commits/master)
+[![Tests](https://github.com/JuliaGNSS/PhasedArray.jl/actions/workflows/ci.yml/badge.svg)](https://github.com/JuliaGNSS/PhasedArray.jl/actions)
+[![codecov](https://codecov.io/gh/JuliaGNSS/PhasedArray.jl/branch/master/graph/badge.svg?token=Y6SD07G3QH)](https://codecov.io/gh/JuliaGNSS/PhasedArray.jl)
+
 # PhasedArray.jl
 This module provides common functions associated with antenna arrays.
 Currently it provides the creation of antenna array manifolds of ideal antennas and / or of measured steering vectors based on Look-up-Tables (LUT).
