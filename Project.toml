@@ -1,7 +1,7 @@
 name = "PhasedArray"
 uuid = "26694ec9-1e1a-50ce-959e-f72fe0aa84a3"
 authors = ["Soeren Zorn <soeren.zorn@nav.rwth-aachen.de>"]
-version = "0.7.0"
+version = "0.7.1"
 
 [deps]
 CoordinateTransformations = "150eb455-5306-5404-9cee-2592286d6298"
