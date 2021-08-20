@@ -14,8 +14,8 @@ Currently it provides the creation of antenna array manifolds of ideal antennas 
 
 Install:
 ```julia
-import Pkg
-Pkg.add("git@git.rwth-aachen.de:nav/PhasedArray.jl.git")
+julia> ]
+pkg> add PhasedArray
 ```
 
 ## Usage
