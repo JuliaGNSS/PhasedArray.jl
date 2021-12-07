@@ -49,8 +49,8 @@
     @test get_steer_vec(manifold, [0, 0, 1]) ≈ ones(num_ant_x^2)
     @test get_steer_vec(manifold, [1, 0, 0]) ≈ sign.(positions[1,:]).*im
     @test get_steer_vec(manifold, [0, 1, 0]) ≈ sign.(positions[2,:]).*im
-    @test all(abs.(rem.(positions[1,:] .- π/2, π, RoundNearest)) .≈ 0)
-    @test all(abs.(rem.(positions[2,:] .- π/2, π, RoundNearest)) .≈ 0)
+    @test all(abs.(rem.(positions[1,:] .- π/2, 1.0π, RoundNearest)) .≈ 0)
+    @test all(abs.(rem.(positions[2,:] .- π/2, 1.0π, RoundNearest)) .≈ 0)
 
     num_ant_y = 3
     dist_y = 1
@@ -60,6 +60,6 @@
     @test get_steer_vec(manifold, [0, 0, 1]) ≈ ones(num_ant_x*num_ant_y)
     @test get_steer_vec(manifold, [1, 0, 0]) ≈ sign.(positions[1,:]).*im
     @test get_steer_vec(manifold, [0, 1, 0]) ≈ ones(num_ant_x*num_ant_y)
-    @test all(rem.(positions[1,:] .- π/2, π, RoundNearest) .≈ 0)
-    @test all(rem.(positions[2,:], 2π, RoundNearest) .≈ 0)
+    @test all(rem.(positions[1,:] .- π/2, 1.0π, RoundNearest) .≈ 0)
+    @test all(rem.(positions[2,:], 2.0π, RoundNearest) .≈ 0)
 end
