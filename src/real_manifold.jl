@@ -56,10 +56,12 @@ function RealManifold(
     RealManifold{N, typeof(interpolated_lut)}(num_azimuth_angles, num_elevation_angles, azimuth_step, elevation_step, max_elevation, expansion_length, interpolated_lut)
 end
 
-get_elevation_interpolation(::Type{Q}) where Q <: Interpolations.Degree = Q()
+get_elevation_interpolation(::Type{Q}) where Q <: Interpolations.DegreeBC{0} = Q()
+get_elevation_interpolation(::Type{Q}) where Q <: Interpolations.DegreeBC{1} = Q()
 # In Elevation direction the boundary is reflective with a 180° circleshift, see `expand`
 get_elevation_interpolation(::Type{Q}) where Q <: Interpolations.DegreeBC = Q(Reflect(OnCell()))
-get_azimuth_interpolation(::Type{Q}) where Q <: Interpolations.Degree = Q()
+get_azimuth_interpolation(::Type{Q}) where Q <: Interpolations.DegreeBC{0} = Q()
+get_azimuth_interpolation(::Type{Q}) where Q <: Interpolations.DegreeBC{1} = Q()
 # In Azimuth direction the boundary is periodic so one could use Quadratic(Periodic(OnCell())), but 
 # this is twice as slow as Quadratic(Reflect(OnCell())), that's why we copy left to the right and right to left
 get_azimuth_interpolation(::Type{Q}) where Q <: Interpolations.DegreeBC = Q(Reflect(OnCell()))
@@ -152,8 +154,8 @@ function test_lut_correctness(lut::AbstractArray{Complex{T}, 3}, max_el) where T
     num_ants = size(lut, 1)
     near_horizont_index = min(floor(Int, π / 2 / max_el * num_els), num_els)
     lut_reference_one = lut[2:end, :, :] ./ lut[1:1, :, :]
-    zenith_angle_var = var(angle.(@view(lut_reference_one[:, 1, :])))
-    horizont_angle_var = var(angle.(@view(lut_reference_one[:, near_horizont_index, :])))
+    zenith_angle_var = mean(var(angle.(@view(lut_reference_one[:, 1, :])), dims = 2))
+    horizont_angle_var = mean(var(angle.(@view(lut_reference_one[:, near_horizont_index, :])), dims = 2))
     (zenith_angle_var > horizont_angle_var) && error("First row of manifold LUT should be zenith")
     error_az = norm(lut[:,:,1] - lut[:,:,end]) / num_els / num_ants
     (error_az > 2) && error("Azimuth of manifold LUT should vary over columns. First and last column should be similar.")
