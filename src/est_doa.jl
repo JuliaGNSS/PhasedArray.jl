@@ -10,19 +10,29 @@ will use the hill climbing algorithm.
 The hill climbing algorithm should be a lot faster than plain maximum search,
 but may only find a local maximum, which might be desired.
 
+# Examples
+Using the signal subspace:
+```julia-repl
+julia> est_doa(manifold, a -> norm(signal_subspace' * a) / norm(a))
+```
+
+Using the noise subspace (MUSIC):
+```julia-repl
+julia> est_doa(manifold, a -> norm(a) / norm(noise_subspace' * a))
+```
+
 # Arguments:
-- `m::AbstractManifold{N}`: Manifold of the antenna array
-- `s::AbstractVector`: Signal subspace for which the doa is estimated
+- `manifold::AbstractManifold`: Manifold of the antenna array
+- `reduction_function`: Function that reduces the manifold vector to a scalar
 """
-function est_doa_by_music(
-    m::AbstractManifold{N},
-    s::AbstractVector;
+function est_doa(
+    manifold::AbstractManifold,
+    reduction_function;
     init_az = nothing,
     init_el = nothing,
     kwargs...
-) where N
-    length(s) == N || ArgumentError("Number of antenna channels must match")
-    p = Pattern(m, x -> abs(s' * x) / norm(x); kwargs...)
+)
+    p = Pattern(manifold, reduction_function; kwargs...)
     if isnothing(init_az) || isnothing(init_el) 
         _, idx = findmax(p.values)
     else

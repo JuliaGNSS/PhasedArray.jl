@@ -21,7 +21,7 @@ module PhasedArray
         calc_amplitude_filter,
         calc_eigen_beamformer,
         calc_variance_covariance,
-        est_doa_by_music,
+        est_doa,
         get_num_ants
 
     const cart2sph = SphericalFromCartesian()
