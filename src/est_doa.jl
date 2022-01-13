@@ -48,6 +48,61 @@ end
 """
 $(SIGNATURES)
 
+This is a convenience function of `est_doa`.
+See `est_doa` for more details.
+"""
+function est_doa_by_noise_subspace(
+    manifold::AbstractManifold{N},
+    noise_subspace;
+    init_az = nothing,
+    init_el = nothing,
+    kwargs...
+) where N
+    size(noise_subspace, 1) == N || ArgumentError("Number of antenna channels must match")
+    est_doa(
+        manifold,
+        a -> norm(a) / norm(noise_subspace' * a);
+        init_az = init_az,
+        init_el = init_el,
+        kwargs...
+    )
+end
+
+"""
+$(SIGNATURES)
+
+This is a convenience function of `est_doa`.
+See `est_doa` for more details.
+"""
+function est_doa_by_signal_subspace(
+    manifold::AbstractManifold{N},
+    signal_subspace;
+    init_az = nothing,
+    init_el = nothing,
+    kwargs...
+) where N
+    size(signal_subspace, 1) == N || ArgumentError("Number of antenna channels must match")
+    est_doa(
+        manifold,
+        a -> norm(signal_subspace' * a) / norm(a);
+        init_az = init_az,
+        init_el = init_el,
+        kwargs...
+    )
+end
+
+"""
+$(SIGNATURES)
+
+This is a convenience function of `est_doa`.
+See `est_doa` for more details.
+"""
+est_doa_by_music(m, ns; init_az = nothing, init_el = nothing, k...) =
+    est_doa_by_noise_subspace(m, ns, init_az = init_az, init_el = init_el, k...)
+
+"""
+$(SIGNATURES)
+
 Multi-dimensionial hill climbing. 
 
 # Arguments:
