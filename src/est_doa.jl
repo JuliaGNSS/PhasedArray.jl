@@ -1,28 +1,38 @@
 """
 $(SIGNATURES)
 
-Calculate the direction of arrival of the signal `s` with respect to the 
-manifold `m`. The calculated DOA is returned as `Spherical` object, where the
+Calculate the Direction Of Arrival (DOA) with respect to the manifold
+`manifold`. The calculated DOA is returned as `Spherical` object, where the
 azimuth is counted counter-clockwise from the x axis and the elevation is
 counted from the xy-plane towards the zenith.
-If the initial azimuth `init_az` and elevation `init_el` is provided, this
+If the initial azimuth `init_az` and elevation `init_el` are provided, this
 will use the hill climbing algorithm.
 The hill climbing algorithm should be a lot faster than plain maximum search,
 but may only find a local maximum, which might be desired.
 
+# Examples
+Using the signal subspace:
+```julia-repl
+julia> est_doa(manifold, a -> norm(signal_subspace' * a) / norm(a))
+```
+
+Using the noise subspace (MUSIC):
+```julia-repl
+julia> est_doa(manifold, a -> norm(a) / norm(noise_subspace' * a))
+```
+
 # Arguments:
-- `m::AbstractManifold{N}`: Manifold of the antenna array
-- `s::AbstractVector`: Signal subspace for which the doa is estimated
+- `manifold::AbstractManifold`: Manifold of the antenna array
+- `reduction_function`: Function that reduces the manifold vector to a scalar
 """
-function est_doa_by_music(
-    m::AbstractManifold{N},
-    s::AbstractVector;
+function est_doa(
+    manifold::AbstractManifold,
+    reduction_function;
     init_az = nothing,
     init_el = nothing,
     kwargs...
-) where N
-    length(s) == N || ArgumentError("Number of antenna channels must match")
-    p = Pattern(m, x -> abs(s' * x) / norm(x); kwargs...)
+)
+    p = Pattern(manifold, reduction_function; kwargs...)
     if isnothing(init_az) || isnothing(init_el) 
         _, idx = findmax(p.values)
     else
@@ -34,6 +44,61 @@ function est_doa_by_music(
     el = p.els[idx.I[1]]
     return Spherical(1, az, π / 2 - el)
 end
+
+"""
+$(SIGNATURES)
+
+This is a convenience function of `est_doa`.
+See `est_doa` for more details.
+"""
+function est_doa_by_noise_subspace(
+    manifold::AbstractManifold{N},
+    noise_subspace;
+    init_az = nothing,
+    init_el = nothing,
+    kwargs...
+) where N
+    size(noise_subspace, 1) == N || ArgumentError("Number of antenna channels must match")
+    est_doa(
+        manifold,
+        a -> norm(a) / norm(noise_subspace' * a);
+        init_az = init_az,
+        init_el = init_el,
+        kwargs...
+    )
+end
+
+"""
+$(SIGNATURES)
+
+This is a convenience function of `est_doa`.
+See `est_doa` for more details.
+"""
+function est_doa_by_signal_subspace(
+    manifold::AbstractManifold{N},
+    signal_subspace;
+    init_az = nothing,
+    init_el = nothing,
+    kwargs...
+) where N
+    size(signal_subspace, 1) == N || ArgumentError("Number of antenna channels must match")
+    est_doa(
+        manifold,
+        a -> norm(signal_subspace' * a) / norm(a);
+        init_az = init_az,
+        init_el = init_el,
+        kwargs...
+    )
+end
+
+"""
+$(SIGNATURES)
+
+This is a convenience function of `est_doa`.
+See `est_doa` for more details.
+"""
+est_doa_by_music(m, ns; init_az = nothing, init_el = nothing, k...) =
+    est_doa_by_noise_subspace(m, ns, init_az = init_az, init_el = init_el, k...)
 
 """
 $(SIGNATURES)
