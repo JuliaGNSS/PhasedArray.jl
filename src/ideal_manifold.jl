@@ -45,7 +45,7 @@ function IdealManifold(f_0::Real, num_ant_xy, dist_xy; kwargs...)
 end
 
 function get_steer_vec(manifold::IdealManifold, doa)
-    cis.(transpose(manifold.scaled_antenna_positions) * doa)
+    cis.(transpose(manifold.scaled_antenna_positions) * doa / norm(doa))
 end
 
 function IdealManifold()

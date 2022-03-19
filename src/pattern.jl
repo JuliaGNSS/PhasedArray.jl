@@ -18,7 +18,7 @@ struct Pattern3D{T}
 end
 
 function Pattern(manifold, reduce_ant_fun = norm; num_az = 360, num_el = 91, max_el = π / 2)
-    azs = range(0, step = 2π/num_az, length = num_az)
+    azs = range(0, step = 2π/num_az, length = num_az + 1)
     els = range(0, stop = max_el, length = num_el)
     values = [reduce_ant_fun(get_steer_vec(manifold, Spherical(1.0, az, π / 2 - el))) for el in els, az in azs]
     Pattern(azs, els, values, max_el)
