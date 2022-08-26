@@ -24,8 +24,8 @@ end
         @test lut_expanded[i,13,3:12] == circshift(lut_expanded[i,11,3:12], 5)
     end
 
-    @test PhasedArray.calc_expansion_length(Constant) == 0
-    @test PhasedArray.calc_expansion_length(Constant) == 0
+    @test PhasedArray.calc_expansion_length(Constant) == 1
+    @test PhasedArray.calc_expansion_length(Constant) == 1
     @test PhasedArray.calc_expansion_length(Quadratic) == 18
 end
 
@@ -47,6 +47,10 @@ end
     @test @inferred(get_steer_vec(manifold, Spherical(1,0,0))) ≈ [1im, -1im, 1im, -1im]
     @test @inferred(get_steer_vec(manifold, Spherical(1,0,0), RotXYZ(0.0,0.0,π/2))) ≈ [1im, 1im, -1im, -1im]
     @test @inferred(get_steer_vec(manifold, SVector(1,0,0), RotXYZ(0.0,0.0,π/2))) ≈ [1im, 1im, -1im, -1im]
+
+    # This errored before:
+    doa = SVector(0.25394112649966244, -9.029703527250079e-6, 0.9672196773176954)
+    @test @inferred(get_steer_vec(manifold, doa)) ≈ [0.9184897712563223 + 0.3954447370967388im, 0.9184897712563223 - 0.3954447370967388im, 0.9184897712563223 + 0.3954447370967388im, 0.9184897712563223 - 0.3954447370967388im]
 
     manifold = @inferred RealManifold(lut[1], lut[2], lut[3], lut[4], max_elevation = π / 2)
     @test typeof(manifold) <: AbstractManifold{4}
