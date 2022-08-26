@@ -104,7 +104,7 @@ function get_steer_vec(manifold::RealManifold, doa)
 end
 
 function calc_expansion_length(::Type{<:Interpolations.Degree})
-    0
+    1
 end
 
 function calc_expansion_length(::Type{Quadratic})
