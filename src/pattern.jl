@@ -17,6 +17,33 @@ struct Pattern3D{T}
     max_el::Float64
 end
 
+struct ScatterPattern{
+    A<:AbstractVector,
+    V<:AbstractVector
+}
+azs::A
+els::A
+values::V
+max_el::Float64
+end
+
+function ScatterPattern(doas, values::AbstractVector{<:Real})
+    doas_sph = cart2sph.(doas)
+    azs = map(doa -> doa.θ, doas_sph)
+    els = map(doa -> (π / 2 - doa.ϕ) * 180 / π, doas_sph)
+    ScatterPattern(azs, els, values, maximum(els))
+end
+
+@recipe function f(pattern::ScatterPattern;)
+    seriestype := :scatter
+    seriescolor --> :Reds
+    colorbar_title --> "Magnitude"
+    projection --> :polar
+    ylims --> (0, pattern.max_el)
+    marker_z --> pattern.values
+    pattern.azs, pattern.els
+end
+
 function Pattern(manifold, reduce_ant_fun = norm; num_az = 360, num_el = 91, max_el = π / 2)
     azs = range(0, step = 2π/num_az, length = num_az + 1)
     els = range(0, stop = max_el, length = num_el)
