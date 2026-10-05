@@ -145,7 +145,7 @@ end
 Normalizes the manifold such that the maximal norm is `sqrt(num_ants)`.
 """
 function norm_manifold(lut::AbstractArray{Complex{T}, 3}) where {T <: Real}
-    max_norm = mapreduce(norm, max, Slices(lut, True(), False(), False()))
+    max_norm = mapreduce(norm, max, JuliennedArrays.Slices(lut, True(), False(), False()))
     lut ./ (max_norm / sqrt(size(lut, 1)))
 end
 
