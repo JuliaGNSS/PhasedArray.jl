@@ -17,6 +17,7 @@ module PhasedArray
         get_steer_vec,
         Pattern,
         Pattern3D,
+        ScatterPattern,
         calc_prewhitening_filter,
         calc_amplitude_filter,
         calc_eigen_beamformer,
@@ -25,7 +26,8 @@ module PhasedArray
         est_doa_by_signal_subspace,
         est_doa_by_noise_subspace,
         est_doa_by_music,
-        get_num_ants
+        get_num_ants,
+        samv2
 
     const cart2sph = SphericalFromCartesian()
     const sph2cart = CartesianFromSpherical()
@@ -39,4 +41,6 @@ module PhasedArray
     include("real_manifold.jl")
     include("pattern.jl")
     include("filter.jl")
+    include("points_on_sphere.jl")
+    include("samv.jl")
 end
